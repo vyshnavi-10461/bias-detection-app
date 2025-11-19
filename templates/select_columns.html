@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Select Columns</h2>
+<form method="POST" action="{{ url_for('select_columns') }}">
+    <input type="hidden" name="filename" value="{{ filename }}">
+
+    <div class="mb-3">
+        <label class="form-label">Select Target (Numeric Column)</label>
+        <select name="target" class="form-select" required>
+            {% for col in numeric_cols %}
+                <option value="{{ col }}">{{ col }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Select Sensitive Attribute (Categorical Column)</label>
+        <select name="sensitive" class="form-select" required>
+            {% for col in categorical_cols %}
+                <option value="{{ col }}">{{ col }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Continue</button>
+</form>
+{% endblock %}

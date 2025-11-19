@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fairness Analysis Results</title>
+</head>
+<body>
+    <h2>Fairness Analysis Result</h2>
+
+    <h3>Average Grades by Group</h3>
+    {% for group, value in means.items() %}
+        <p>{{ group }} : {{ value }}</p>
+    {% endfor %}
+
+    <p><strong>Demographic Parity Difference:</strong> {{ dpd }}</p>
+    <p><strong>Disparate Impact Ratio:</strong> {{ dir_value }}</p>
+
+    <br>
+    <a href="/">Upload Another File</a>
+</body>
+</html>

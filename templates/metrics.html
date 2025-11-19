@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fairness Metrics</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f8f9fc;
+            font-family: "Poppins", sans-serif;
+        }
+        .metrics-card {
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+            transition: transform 0.25s ease;
+        }
+        .metrics-card:hover {
+            transform: scale(1.02);
+        }
+        .metric-box {
+            background: #ffffff;
+            padding: 18px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .metric-title {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .metric-value {
+            font-size: 1.35rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .badge-custom {
+            background: #6c63ff;
+            font-size: 0.8rem;
+        }
+        .btn-custom {
+            background: #6c63ff;
+            color: white;
+            border-radius: 8px;
+        }
+        .btn-custom:hover {
+            background: #5348ff;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="container py-5">
+        <h2 class="text-center mb-3 fw-bold">📊 Fairness & Model Bias Metrics</h2>
+        <p class="text-center text-muted mb-4">Evaluating dataset fairness metrics for uploaded file: <b>{{ filename }}</b></p>
+
+        <div class="card metrics-card p-4 mx-auto" style="max-width: 900px;">
+            
+            <h5 class="mb-3">🔹 Sensitive Attribute: 
+                <span class="badge badge-custom">{{ metrics.sensitive_column }}</span>
+            </h5>
+
+            <!-- Rates Section -->
+<h5 class="mb-2">📈 Positive Rates by Group</h5>
+<div class="row">
+
+    {% for group, value in metrics.rates.items() %}
+    <div class="col-md-4 mb-3">
+        <div class="metric-box text-center">
+            <span class="metric-title">{{ group }}</span>
+            <div class="metric-value">{{ "%.3f"|format(value) }}</div>
+        </div>
+    </div>
+    {% endfor %}
+
+</div> <!-- end of row -->
+
+<!-- Chart Display -->
+<!-- Chart Display -->
+<h5 class="mt-4 mb-2 text-center">📊 Visual Chart Representation</h5>
+<div class="chart-container text-center mb-4">
+    {{ metrics.chart | safe }}
+</div>
+
+
+<hr>
+
+
+            <!-- Final Metrics -->
+            
+
+            <div class="row text-center">
+                <div class="col-md-6">
+                    <h6>Demographic Parity Difference (DPD)</h6>
+                    <p class="metric-value text-danger">{{ "%.4f"|format(metrics.dpd) }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Disparate Impact Ratio (DIR)</h6>
+                    <p class="metric-value text-success">
+                        {% if metrics.dir %}
+                            {{ "%.4f"|format(metrics.dir) }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="/" class="btn btn-custom px-4">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

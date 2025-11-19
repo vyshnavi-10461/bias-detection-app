@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Raw Data — {{ filename }}</h3>
+
+<div class="mb-3">
+  {{ head_html | safe }}
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    {% if gender_plot %}
+      <h6>By Gender</h6>
+      {{ gender_plot | safe }}
+    {% endif %}
+  </div>
+  <div class="col-md-6">
+    {% if plot_group %}
+      <div class="my-3">{{ plot_group | safe }}</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ✔ Buttons should be placed here -->
+<div class="mt-3 d-flex gap-3 flex-wrap">
+  <a href="{{ url_for('metrics', filename=filename) }}" class="btn-modern btn-view">📊 View Metrics</a>
+  <a href="{{ url_for('model_page', filename=filename) }}" class="btn-modern btn-train">🤖 Train Model</a>
+  <a href="{{ url_for('export_data', filename=filename) }}" class="btn-modern btn-download">⬇️ Download CSV</a>
+</div>
+
+{% endblock %}
