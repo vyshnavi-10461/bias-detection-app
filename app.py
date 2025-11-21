@@ -214,12 +214,24 @@ def register():
                 (username, password_hash)
             )
             db.commit()
+
+            # AUTO LOGIN AFTER REGISTER
+            user = db.execute(
+                "SELECT * FROM users WHERE username = ?",
+                (username,)
+            ).fetchone()
+
+            session["user_id"] = user["id"]
+            session["username"] = user["username"]
+
             flash("Registration successful!", "success")
-            return redirect(url_for("login"))
+            return redirect(url_for("index"))   # redirect to HOME PAGE
+
         except:
             flash("Username already exists!", "danger")
 
     return render_template("register.html")
+
 
 
 @app.route("/login", methods=["GET", "POST"])
