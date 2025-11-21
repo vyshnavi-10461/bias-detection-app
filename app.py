@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file, flash
+from flask import Flask, render_template, request, redirect, url_for, send_file, flash, session
 import os, io, csv
 import pandas as pd
 import numpy as np
@@ -7,6 +7,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.pipeline import Pipeline
 import joblib
+import hashlib
 
 from utils import (
     load_dataset, basic_preprocess, basic_bias_metrics,
@@ -16,13 +17,14 @@ from utils import (
     compute_reweighing_weights, plot_rates
 )
 
-from flask import Flask, render_template, request, redirect, url_for, send_file, flash, session
-
+from database import get_db, init_db, close_db
 
 app = Flask(__name__)
 app.secret_key = "change_this_in_prod"
+
 UPLOAD_FOLDER = "data"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 
 @app.route("/")
 def index():
@@ -57,7 +59,7 @@ def bias(filename):
     return render_template(
         "bias.html",
         filename=filename,
-        head_html=df.head().to_html(classes="table table-sm"),
+        head_html=df.to_html(classes="table table-sm", max_rows=1000),
         target=target,
         sensitive_cols=sensitive_cols,
         metrics=metrics
@@ -195,13 +197,14 @@ def export_metrics(filename):
 def export_data(filename):
     return send_file(os.path.join(UPLOAD_FOLDER, filename), as_attachment=True)
 
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
 
-        # hash password
         password_hash = hashlib.sha256(password.encode()).hexdigest()
 
         db = get_db()
@@ -215,11 +218,16 @@ def register():
             return redirect(url_for("login"))
         except:
             flash("Username already exists!", "danger")
-        
+
     return render_template("register.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if "user_id" in session:
+        flash("You are already logged in.", "info")
+        return redirect(url_for("index"))
+
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
@@ -237,14 +245,16 @@ def login():
         ).fetchone()
 
         if user:
+            session.permanent = True
             session["user_id"] = user["id"]
             session["username"] = user["username"]
             flash("Login successful!", "success")
             return redirect(url_for("index"))
-        else:
-            flash("Invalid username or password!", "danger")
+
+        flash("Invalid username or password", "danger")
 
     return render_template("login.html")
+
 
 def log_action(user_id, filename, action):
     db = get_db()
