@@ -76,8 +76,14 @@
 <nav class="navbar navbar-expand-lg navbar-dark px-4">
   <a class="navbar-brand fw-bold" href="/">Fairness Dashboard</a>
   <div class="ms-auto">
-      <button class="btn btn-light text-dark" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
-  </div>
+    {% if session.get('user_id') %}
+        <span class="me-3">Hi, {{ session['username'] }} 👋</span>
+        <a href="/logout" class="btn btn-danger">Logout</a>
+    {% else %}
+        <button class="btn btn-light text-dark" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+    {% endif %}
+</div>
+
 </nav>
 
 
@@ -119,6 +125,11 @@
         <input type="text" name="username" class="form-control mb-3" required>
         <label>Password</label>
         <input type="password" name="password" class="form-control mb-3" required>
+        <p class="text-center mt-2">
+    Don't have an account?
+    <a href="/register">Create one</a>
+</p>
+
       </div>
 
       <div class="modal-footer">

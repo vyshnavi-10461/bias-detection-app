@@ -25,6 +25,9 @@ app.secret_key = "change_this_in_prod"
 UPLOAD_FOLDER = "data"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+with app.app_context():
+    init_db()
+
 
 @app.route("/")
 def index():
@@ -224,6 +227,8 @@ def register():
             session["user_id"] = user["id"]
             session["username"] = user["username"]
 
+            session.pop('_flashes', None)
+
             flash("Registration successful!", "success")
             return redirect(url_for("index"))   # redirect to HOME PAGE
 
@@ -275,6 +280,13 @@ def log_action(user_id, filename, action):
         (user_id, filename, action)
     )
     db.commit()
+    
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash("Logged out successfully!", "info")
+    return redirect(url_for("login"))
+
 
 from database import get_db, init_db
 import hashlib
@@ -287,6 +299,8 @@ if __name__ == "__main__":
     with app.app_context():
         init_db()      # NOW works safely inside context
     app.run(debug=True)
+
+
 
 
 
